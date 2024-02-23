@@ -1,0 +1,98 @@
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+public class App extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Grade Calculator");
+
+        // Create UI elements
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setVgap(8);
+        grid.setHgap(10);
+
+        Label subjectLabel = new Label("Number of Subjects:");
+        GridPane.setConstraints(subjectLabel, 0, 0);
+
+        TextField subjectField = new TextField();
+        subjectField.setPromptText("Enter number of subjects");
+        GridPane.setConstraints(subjectField, 1, 0);
+
+        Button subjectButton = new Button("Enter");
+        GridPane.setConstraints(subjectButton, 2, 0);
+
+        grid.getChildren().addAll(subjectLabel, subjectField, subjectButton);
+
+        subjectButton.setOnAction(e -> {
+            int numOfSubjects = Integer.parseInt(subjectField.getText());
+
+            Label[] labels = new Label[numOfSubjects];
+            TextField[] textFields = new TextField[numOfSubjects];
+
+            for (int i = 0; i < numOfSubjects; i++) {
+                labels[i] = new Label("Subject " + (i + 1) + ":");
+                textFields[i] = new TextField();
+                GridPane.setConstraints(labels[i], 0, i + 1);
+                GridPane.setConstraints(textFields[i], 1, i + 1);
+                grid.getChildren().addAll(labels[i], textFields[i]);
+            }
+
+            Button calculateButton = new Button("Calculate");
+            GridPane.setConstraints(calculateButton, 1, numOfSubjects + 1);
+
+            Label resultLabel = new Label();
+            GridPane.setConstraints(resultLabel, 0, numOfSubjects + 2, 2, 1);
+            grid.getChildren().addAll(calculateButton, resultLabel);
+
+            // Calculate button action
+            calculateButton.setOnAction(event -> {
+                int totalMarks = 0;
+                int numberOfSubjects = 0;
+                for (TextField textField : textFields) {
+                    if (!textField.getText().isEmpty()) {
+                        totalMarks += Integer.parseInt(textField.getText());
+                        numberOfSubjects++;
+                    }
+                }
+
+                if (numberOfSubjects == 0) {
+                    resultLabel.setText("Please enter marks for at least one subject.");
+                    return;
+                }
+
+                double averagePercentage = (double) totalMarks / numberOfSubjects;
+
+                String grade;
+                if (averagePercentage >= 90) {
+                    grade = "A";
+                } else if (averagePercentage >= 80) {
+                    grade = "B";
+                } else if (averagePercentage >= 70) {
+                    grade = "C";
+                } else if (averagePercentage >= 60) {
+                    grade = "D";
+                } else {
+                    grade = "F";
+                }
+
+                String result = String.format("Total Marks: %d\nAverage Percentage: %.2f\nGrade: %s",
+                                              totalMarks, averagePercentage, grade);
+                resultLabel.setText(result);
+            });
+        });
+
+        Scene scene = new Scene(grid, 300, 200);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
